@@ -22,6 +22,13 @@ def charProg(name):
     info = json.loads(urllib.urlopen(url).read())
     return info
 
+def charSttics(name):
+    logkey = '?fields=statistics&locale=en_GB&apikey=' + key
+    url = base + name + logkey
+    info = json.loads(urllib.urlopen(url).read())
+    return info
+
+
 def date(stamp):
     dateStr = time.ctime(stamp/1000)
     return dateStr
@@ -59,7 +66,7 @@ def clearData():
         json.dump(general, fp)
     return general
 
-def updateHTML(gen, upd):
+def updateHTML(gen):
     htmlFile = open('datashow.html','w') # CAMBIAR DIRECTORIO!
     message = "<h3> Dofilock: Info saves </h3> Informacion sobre saves de cada player, datos extraidos de la api de battle net, por lo que es posible que la informacion no este 100% correcta/actualizada ya que los updates de blizzard no se realizan cada instante, ademas, hay eventos que se pueden perder en el feed que nos proporcionan. Disculpas por la representacion tan chapucera, es lo mas rapido funcional, sera mejorado.<br>"
 
@@ -81,11 +88,11 @@ def updateHTML(gen, upd):
         messUpd = messUpd + "<br>" + repr(item) + ": " + repr(gen[2][item])
     message = message + messUpd
 
-    message = message + "<br><br> Last updates: "
-    messUpd = ""
-    for item in upd:
-        messUpd = messUpd + "<br>" + repr(item) + ": " + repr(upd[item])
-    message = message + messUpd
+    # message = message + "<br><br> Last updates: "
+    # messUpd = ""
+    # for item in upd:
+    #     messUpd = messUpd + "<br>" + repr(item) + ": " + repr(upd[item])
+    # message = message + messUpd
 
     htmlFile.write(message)
     htmlFile.close()
@@ -96,7 +103,7 @@ MODE = 'MAN'
 # STEP = 'RUN'
 
 # A base datos......
-miembros = ['Wizote', 'Cuxulain', 'Lorzo', 'Nimro', 'Fudan', 'Palomitera', 'Odlarg', \
+miembros = ['Wizaras', 'Cuxulain', 'Lorzo', 'Nimro', 'Fudan', 'Palomitera', 'Odlarg', \
             'Khaelan', 'Llonganisa', 'Racknnar', 'Stiwie', 'Vaironn', 'Uborzz']
 
 if MODE == 'FIRST':
@@ -142,27 +149,22 @@ while 1:
         count = 0
         for miembro in miembros:
             try:
-                a = charFeed(miembro)
+                a = charSttics(miembro)
                 count = count + 1
-                print '> Processing dofito', count, 'of', len(miembros), '...'
-
-                for i in range(50):
+                codigosInstanceApi = [2,5,8,11,14,16,17,20,23,26,27,28]
+                print '> Counting dofito', count, 'of', len(miembros), '...'
+                for i in codigosInstanceApi:
                     # fecha mayor que ultimo miercoles?
-                    actual = a['feed'][i]['timestamp']
+                    d = a['statistics']['subCategories'][5]['subCategories'][6]['statistics'][i]
+                    actual = d['lastUpdated']
                     if  actual > lastWeds:
-                        # Es una kill final boss?
-                        if a['feed'][i]['type'] == 'BOSSKILL':
-                            # Es en mitico?
-                            b = a['feed'][i]['achievement']['title']
-                            if b.find('(Mythic ') >= 1:
-                                print json.dumps(date(a['feed'][i]['timestamp']))[1:-5], json.dumps(b).split('(Mythic ')[1][:-2]
-                                try:
-                                    c = json.dumps(b).split('(Mythic ')[1][:-2]
-                                    if miembro not in instances[c]:
-                                        instances[c].append(miembro)
-                                except:
-                                    pass
-                lastUpd[miembro] = date(a['feed'][1]['timestamp'])
+                        try:
+                            c = json.dumps(a['name']).split('(Mythic ')[1][:-2]
+                            if miembro not in instances[c]:
+                                instances[c].append(miembro)
+                        except:
+                            pass
+                # lastUpd[miembro] = date(a['feed'][1]['timestamp'])
 
 
 
@@ -207,14 +209,14 @@ while 1:
         # print "Betrayers detection"
         # print "Betrayers de la semana en Mythic: ", betrayers
 
-        print ' ~~~~~~~~~~~~ '
-        print 'Ultima lectura:'
+        # print ' ~~~~~~~~~~~~ '
+        # print 'Ultima lectura:'
+        #
+        # for miembro in miembros:
+        #     print miembro, lastUpd[miembro]
 
-        for miembro in miembros:
-            print miembro, lastUpd[miembro]
 
-
-        updateHTML(general, lastUpd)
+        updateHTML(general)
 
         # db.update_one()
         # if martes:
