@@ -120,7 +120,8 @@ MODE = 'MAN'
 
 # A base datos......
 miembros = ['Wizaras', 'Cuxulain', 'Lorzo', 'Nimro', 'Fudan', 'Palomitera', 'Odlarg', 'Megainho', 'Wizote', \
-            'Khaelan', 'Llonganisa', 'Racknnar', 'Stiwie', 'Vaironn', 'Uborzz', 'Sàs', 'Yarako', 'Kaelan']
+            'Khaelan', 'Llonganisa', 'Racknnar', 'Stiwie', 'Vaironn', 'Uborzz', 'Sàs', 'Yarako', 'Kaelan',
+            'Druscaelan', 'Yakuka']
 ilvls = dict()
 
 for miembro in miembros:
@@ -156,7 +157,11 @@ while 1:
     # db.find???
     if checkReset() == 1 and flag == False:
         flag = True
-        clearData()
+        general = clearData()
+        instances = general[0]
+        emeraldN = general[1]
+        emeraldH = general[2]
+
         lastWeds = lastW()
         print 'Limpiando...'
     elif checkReset() == 2 and flag == True:
